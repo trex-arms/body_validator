@@ -1,0 +1,25 @@
+{
+  "name": "body_validator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trex-arms/body_validator.git"
+  },
+  "keywords": [
+    "MIT"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trex-arms/body_validator/issues"
+  },
+  "homepage": "https://github.com/trex-arms/body_validator#readme",
+  "devDependencies": {
+    "uvu": "^0.5.6"
+  }
+}
