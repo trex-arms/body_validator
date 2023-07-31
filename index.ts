@@ -222,7 +222,7 @@ const make_exact_validator = <T>(value: T): Validator<T> => ({
 	},
 	get_messages(input: unknown, name: string) {
 		if (input !== value) {
-			return [ `"${ double_quote(name) }" should be "${ input }"` ]
+			return [ `"${ double_quote(name) }" should be "${ value }"` ]
 		}
 		return []
 	},
