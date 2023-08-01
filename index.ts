@@ -126,14 +126,12 @@ const make_array_validator = <T>(element_validator: NonOptionalValidator<T>) => 
 }
 
 const make_object_values_validator = <T>(element_validator: NonOptionalValidator<T>) => {
-	const array_validator = make_array_validator(element_validator)
-
 	const is_valid = (input: unknown): input is { [key: string]: T } => {
 		if (!is_object(input)) {
 			return false
 		}
 
-		return array_validator.is_valid(values_plz(input))
+		return values_plz(input).every(value => element_validator.is_valid(value))
 	}
 
 	const get_messages = (input: unknown, name: string) => {
@@ -141,7 +139,9 @@ const make_object_values_validator = <T>(element_validator: NonOptionalValidator
 			return [ `${ double_quote(name) } is not an object` ]
 		}
 
-		return array_validator.get_messages(values_plz(input), name)
+		return Object.entries(input)
+			.filter(([key, value]) => !element_validator.is_valid(value))
+			.flatMap(([key, value]) => element_validator.get_messages(value, `${name}.${key}`))
 	}
 
 	return {
