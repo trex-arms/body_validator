@@ -187,6 +187,16 @@ const null_validator: Validator<null> = ({
 	},
 })
 
+const date_validator: Validator<Date> = {
+	is_valid: (value: unknown): value is Date => value instanceof Date,
+	get_messages: (value: unknown, name: string) => {
+		if (!(value instanceof Date)) {
+			return [ `"${ name }" is not a Date` ]
+		}
+		return []
+	},
+}
+
 const nullable = <T>(validator: Validator<T>): Validator<T | null> => one_of(validator, null_validator)
 
 const make_regex_validator = <T extends string>(regex: RegExp, custom_message?: string) => ({
@@ -228,6 +238,16 @@ const make_exact_validator = <T>(value: T): Validator<T> => ({
 
 const optional = <T>(validator: Validator<T>): Validator<T | undefined> => one_of(validator, undefined_validator)
 
+const make_custom_validator = <T>({
+	is_valid,
+	get_messages,
+}: {
+	is_valid: PredicateFunction<T>
+	get_messages: MessageReturningFunction
+}) => ({
+		is_valid,
+		get_messages,
+	})
 
 export default {
 	object: make_object_validator,
@@ -243,4 +263,6 @@ export default {
 	regex: make_regex_validator,
 	optional,
 	exact: make_exact_validator,
+	date: date_validator,
+	custom: make_custom_validator,
 } as const
