@@ -2,9 +2,11 @@
   "name": "body_validator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "tsx test.ts"
+    "build": "tsc",
+    "test": "tsc && node dist/test.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,7 @@
   },
   "homepage": "https://github.com/trex-arms/body_validator#readme",
   "devDependencies": {
-    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
     "uvu": "^0.5.6"
   }
 }
