@@ -224,32 +224,40 @@ options_validator.is_valid({ age: 42 }) // => false
 ```
 
 
-### `v.custom({ is_valid: (input: any) => boolean, get_messages(input: any, name: string) => string[] })`
+### `v.custom(options)`
+
+`options` is an object with these properties:
+
+- `function is_valid(input: any) => boolean`
+- `function get_messages(input: any, name: string) => string[]` The resulting array should be empty if `is_valid` would return `true` for that input, but should have at least one string if `is_valid` would return `false` for that input
 
 ```js
+// Example: IP Address validator
 function is_valid(input) {
 	if (typeof input !== 'string') return false
-	if (input.length !== 10) return false
-	if (!/\d\d\d\d-\d\d-\d\d/.test(input)) return false
 
-	const [ year, month, day ] = input.split('-')
-	if (parseInt(month, 10) > 12) return false
-	if (parseInt(day, 10) > 31) return false
+	const parts = input.split('.')
+	if (parts.length !== 4) return false
 
-	return true
+	return parts
+		.map(p => Number(p))
+		.every(n => !Number.isNaN(n) && n < 256)
 }
 
 function get_messages(input, name) {
 	return is_valid(input)
 		? []
-		: `"${ name}" is not a valid ISO date` // ideally you might give more context, like if the month doesn't exist, or the type if wrong.
+		: [ `"${ name }" is not a valid IP Address` ]
 }
 
-const iso_date_validator = v.custom({ is_valid, get_messages })
+const ip_validator = v.custom({ is_valid, get_messages })
 
-iso_date_validator.is_valid('2024-07-18') // -> true
-iso_date_validator.is_valid('2024-07-32') // -> false
-iso_date_validator.is_valid('2024-13-18') // -> false
+ip_validator.is_valid('192.168.0.1') // => true
+ip_validator.is_valid('1.1.1.1') // => true
+
+ip_validator.is_valid('256.1.2.3') // => false
+ip_validator.is_valid('1.2.3') // => false
+ip_validator.is_valid('1.1.1.1a') // => false
 ```
 
 
