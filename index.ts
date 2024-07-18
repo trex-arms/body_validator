@@ -150,14 +150,12 @@ const make_object_values_validator = <T>(element_validator: NonOptionalValidator
 	}
 }
 
-type OneOf = {
-	<A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B>
-	<A, B, C>(a: Validator<A>, b: Validator<B>, c: Validator<C>): Validator<A | B | C>
-	<A, B, C, D>(a: Validator<A>, b: Validator<B>, c: Validator<C>, d: Validator<D>): Validator<A | B | C | D>
-}
+type UnpackArray<T> = T extends (infer U)[] ? U : T
 
-const one_of: OneOf = <T>(...validators: Validator<T>[]): Validator<T> => {
-	const is_valid = (input: unknown): input is T => validators.some(validator => validator.is_valid(input))
+type UnpackValidator<T> = T extends Validator<(infer U)> ? U : T
+
+const one_of = <T extends Validator<any>[]>(...validators: T): Validator<UnpackValidator<UnpackArray<T>>> => {
+	const is_valid = (input: unknown): input is UnpackValidator<UnpackArray<T>> => validators.some(validator => validator.is_valid(input))
 
 	const get_messages = (input: unknown, name: string) => {
 		if (!is_valid(input)) {
