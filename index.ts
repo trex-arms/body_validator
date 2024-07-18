@@ -140,8 +140,8 @@ const make_object_values_validator = <T>(element_validator: NonOptionalValidator
 		}
 
 		return Object.entries(input)
-			.filter(([key, value]) => !element_validator.is_valid(value))
-			.flatMap(([key, value]) => element_validator.get_messages(value, `${name}.${key}`))
+			.filter(([ _key, value ]) => !element_validator.is_valid(value))
+			.flatMap(([ key, value ]) => element_validator.get_messages(value, `${name}.${key}`))
 	}
 
 	return {
