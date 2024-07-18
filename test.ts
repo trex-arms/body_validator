@@ -199,4 +199,13 @@ test(`exact`, () => {
 	assert.not.ok(validator.is_valid(`wuuuuuuuutt`))
 })
 
+test(`object_values messages`, () => {
+	const validator = v.object_values(v.string)
+
+	assert.equal(validator.get_messages({}, `wat`), [])
+	assert.equal(validator.get_messages({ hello: 'world' }, `wat`), [])
+	assert.equal(validator.get_messages({ non_string: 3 }, `wat`), [ '"wat.non_string" is not a string' ])
+	assert.equal(validator.get_messages({ hello: 'darkness', non_string: 3 }, `wat`), [ '"wat.non_string" is not a string' ])
+})
+
 test.run()
