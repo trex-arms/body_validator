@@ -161,7 +161,7 @@ const one_of = <T extends Validator<any>[]>(...validators: T): Validator<UnpackV
 		if (!is_valid(input)) {
 			const messages = validators
 				.filter(validator => !validator.is_valid(input))
-				.map(validator => validator.get_messages(input, name))
+				.flatMap(validator => validator.get_messages(input, name))
 
 			return [ `${ double_quote(name) }: ${ messages.join(`, or `) }` ]
 		}
