@@ -28,6 +28,8 @@ test(`body_validator object validator`, () => {
 	if (validator.is_valid(valid_input)) {
 		// Should pass the type system
 		valid_input.cool_number
+		// @ts-expect-error
+		valid_input.does_not_exist
 	}
 
 	assert.ok(validator.is_valid(valid_input))

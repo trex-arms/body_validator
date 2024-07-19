@@ -9,9 +9,7 @@ Not currently on npm.  Download the files from Github.  Sorry!
 ## Example
 
 <!--js
-// with gfmjs
-import bv from './dist/index.js'
-const v = bv.default
+import v from './dist/bodyvalidator.mjs'
 -->
 
 ```node
