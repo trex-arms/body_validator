@@ -163,9 +163,9 @@ const one_of: OneOf = <T>(...validators: Validator<T>[]): Validator<T> => {
 		if (!is_valid(input)) {
 			const messages = validators
 				.filter(validator => !validator.is_valid(input))
-				.flatMap(validator => validator.get_messages(input, name))
+				.map(validator => `(${ validator.get_messages(input, name).join(`, and `) })`)
 
-			return [ `${ double_quote(name) }: ${ messages.join(`, or `) }` ]
+			return [ messages.join(`, or `) ]
 		}
 		return []
 	}
