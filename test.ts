@@ -125,7 +125,7 @@ test(`Output messages`, () => {
 		cool_number: `WRONG`,
 		cool_string: `wat`,
 		other_number: 4,
-		other_array: [ `WRONG`, 2 ],
+		other_array: [ `WRONG`, 2, 'ALSO WRONG' ],
 		WRONG: `:-o`,
 	}
 
@@ -133,10 +133,10 @@ test(`Output messages`, () => {
 
 	assert.equal(output, [
 		`"invalid_input" should not have a property named "WRONG" `,
-		`"invalid_input"."cool_number" is not a number`,
-		`"invalid_input"."cool_bool" is not a boolean`,
-		`"invalid_input"."cool_array" is not an array`,
-		`"invalid_input"."other_array": "other_array[0]" is not a number, or "other_array" should be undefined`,
+		`"invalid_input.cool_number" is not a number`,
+		`"invalid_input.cool_bool" is not a boolean`,
+		`"invalid_input.cool_array" is not an array`,
+		`("invalid_input.other_array[0]" is not a number, and "invalid_input.other_array[2]" is not a number), or "invalid_input.other_array" should be undefined`,
 	])
 })
 

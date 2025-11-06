@@ -86,12 +86,12 @@ const make_object_validator = <const OBJECT extends { [key: string]: any }>(shap
 		const property_messages = keys_plz(shape).flatMap(key => {
 			const validator = shape[key]
 
-			return validator.get_messages(input[key], key)
+			return validator.get_messages(input[key], `${ name }.${ key }`)
 		})
 
 		return [
 			...keys_that_dont_exist_in_shape.map(key => `${ quoted_name } should not have a property named ${ double_quote(key) } `),
-			...property_messages.map(message => `${ quoted_name }.${ message }`),
+			...property_messages,
 		]
 	}
 
@@ -161,7 +161,10 @@ const one_of = <T extends Validator<any>[]>(...validators: T): Validator<UnpackV
 		if (!is_valid(input)) {
 			const messages = validators
 				.filter(validator => !validator.is_valid(input))
-				.map(validator => `(${ validator.get_messages(input, name).join(`, and `) })`)
+				.map(validator => {
+					const messages = validator.get_messages(input, name)
+					return messages.length > 1 ? `(${ messages.join(`, and `) })` : messages[0]
+				})
 
 			return [ messages.join(`, or `) ]
 		}
@@ -191,7 +194,7 @@ const date_validator: Validator<Date> = {
 	is_valid: (value: unknown): value is Date => value instanceof Date,
 	get_messages: (value: unknown, name: string) => {
 		if (!(value instanceof Date)) {
-			return [ `"${ name }" is not a Date` ]
+			return [ `${ double_quote(name) } is not a Date` ]
 		}
 		return []
 	},
