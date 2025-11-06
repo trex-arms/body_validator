@@ -15,7 +15,7 @@
   "scripts": {
     "build": "rm -rf dist && microbundle --target node index.ts --generateTypes",
     "pretest": "microbundle --target node -i test.ts -o test.mjs -f esm --no-sourcemap --no-generateTypes",
-    "test": "tsc --noEmit && node test.mjs && gfmjs README.md"
+    "test": "tsc --noEmit && node test.mjs && npm run build && gfmjs README.md"
   },
   "repository": {
     "type": "git",
