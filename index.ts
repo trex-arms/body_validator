@@ -126,14 +126,12 @@ const make_array_validator = <T>(element_validator: NonOptionalValidator<T>) => 
 }
 
 const make_object_values_validator = <T>(element_validator: NonOptionalValidator<T>) => {
-	const array_validator = make_array_validator(element_validator)
-
 	const is_valid = (input: unknown): input is { [key: string]: T } => {
 		if (!is_object(input)) {
 			return false
 		}
 
-		return array_validator.is_valid(values_plz(input))
+		return values_plz(input).every(value => element_validator.is_valid(value))
 	}
 
 	const get_messages = (input: unknown, name: string) => {
@@ -141,7 +139,9 @@ const make_object_values_validator = <T>(element_validator: NonOptionalValidator
 			return [ `${ double_quote(name) } is not an object` ]
 		}
 
-		return array_validator.get_messages(values_plz(input), name)
+		return Object.entries(input)
+			.filter(([ _key, value ]) => !element_validator.is_valid(value))
+			.flatMap(([ key, value ]) => element_validator.get_messages(value, `${name}.${key}`))
 	}
 
 	return {
@@ -150,14 +150,12 @@ const make_object_values_validator = <T>(element_validator: NonOptionalValidator
 	}
 }
 
-type OneOf = {
-	<A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B>
-	<A, B, C>(a: Validator<A>, b: Validator<B>, c: Validator<C>): Validator<A | B | C>
-	<A, B, C, D>(a: Validator<A>, b: Validator<B>, c: Validator<C>, d: Validator<D>): Validator<A | B | C | D>
-}
+type UnpackArray<T> = T extends (infer U)[] ? U : T
 
-const one_of: OneOf = <T>(...validators: Validator<T>[]): Validator<T> => {
-	const is_valid = (input: unknown): input is T => validators.some(validator => validator.is_valid(input))
+type UnpackValidator<T> = T extends Validator<(infer U)> ? U : T
+
+const one_of = <T extends Validator<any>[]>(...validators: T): Validator<UnpackValidator<UnpackArray<T>>> => {
+	const is_valid = (input: unknown): input is UnpackValidator<UnpackArray<T>> => validators.some(validator => validator.is_valid(input))
 
 	const get_messages = (input: unknown, name: string) => {
 		if (!is_valid(input)) {
@@ -188,6 +186,16 @@ const null_validator: Validator<null> = ({
 		return []
 	},
 })
+
+const date_validator: Validator<Date> = {
+	is_valid: (value: unknown): value is Date => value instanceof Date,
+	get_messages: (value: unknown, name: string) => {
+		if (!(value instanceof Date)) {
+			return [ `"${ name }" is not a Date` ]
+		}
+		return []
+	},
+}
 
 const nullable = <T>(validator: Validator<T>): Validator<T | null> => one_of(validator, null_validator)
 
@@ -230,6 +238,16 @@ const make_exact_validator = <T>(value: T): Validator<T> => ({
 
 const optional = <T>(validator: Validator<T>): Validator<T | undefined> => one_of(validator, undefined_validator)
 
+const make_custom_validator = <T>({
+	is_valid,
+	get_messages,
+}: {
+	is_valid: PredicateFunction<T>
+	get_messages: MessageReturningFunction
+}) => ({
+		is_valid,
+		get_messages,
+	})
 
 export default {
 	object: make_object_validator,
@@ -245,4 +263,6 @@ export default {
 	regex: make_regex_validator,
 	optional,
 	exact: make_exact_validator,
+	date: date_validator,
+	custom: make_custom_validator,
 } as const

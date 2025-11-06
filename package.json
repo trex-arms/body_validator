@@ -2,9 +2,20 @@
   "name": "body_validator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "source": "index.ts",
+  "main": "./dist/bodyvalidator.cjs",
+  "umd:main": "./dist/bodyvalidator.umd.js",
+  "module": "./dist/bodyvalidator.mjs",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/bodyvalidator.cjs",
+    "default": "./dist/bodyvalidator.mjs"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -rf dist && microbundle --target node index.ts --generateTypes",
+    "pretest": "microbundle --target node -i test.ts -o test.mjs -f esm --no-sourcemap --no-generateTypes",
+    "test": "tsc --noEmit && node test.mjs && gfmjs README.md"
   },
   "repository": {
     "type": "git",
@@ -20,6 +31,9 @@
   },
   "homepage": "https://github.com/trex-arms/body_validator#readme",
   "devDependencies": {
+    "@builds-dev/gfmjs": "^2.0.0",
+    "microbundle": "^0.15.1",
+    "typescript": "^5.5.3",
     "uvu": "^0.5.6"
   }
 }
